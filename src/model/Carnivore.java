@@ -4,7 +4,7 @@ import core.Grid;
 
 public class Carnivore extends Entity {
 
-    public Carnivore(int x,int y,int energy){
+    public Carnivore(int x,int y,double energy){
         super(x,y,energy);
     }
 
@@ -46,15 +46,13 @@ public class Carnivore extends Entity {
 
     private void reproduce(Grid grid){
 
-        if(Math.random() > 0.3) return;
-
         int nx = x + (int)(Math.random()*3)-1;
         int ny = y + (int)(Math.random()*3)-1;
 
         if(nx>=0 && ny>=0 && nx<grid.getRows() && ny<grid.getCols()){
             if(grid.isEmpty(nx,ny)){
                 grid.addEntity(new Carnivore(nx,ny,energy/2));
-                energy/=2;
+                energy /= 2;
             }
         }
     }

@@ -4,9 +4,9 @@ import core.Grid;
 
 public abstract class Entity {
     protected int x, y;
-    protected int energy;
+    public double energy;
 
-    public Entity(int x, int y, int energy) {
+    public Entity(int x, int y, double energy) {
         this.x = x;
         this.y = y;
         this.energy = energy;
@@ -17,6 +17,7 @@ public abstract class Entity {
     public void move(Grid grid) {
 
         int newX, newY;
+        int attempts = 0;
 
         do {
             newX = x + (int)(Math.random()*3) - 1;
@@ -25,10 +26,14 @@ public abstract class Entity {
             newX = Math.max(0, Math.min(newX, grid.getRows()-1));
             newY = Math.max(0, Math.min(newY, grid.getCols()-1));
 
-        } while (!grid.isEmpty(newX, newY));
+            attempts++;
 
-        x = newX;
-        y = newY;
+        } while (!grid.isEmpty(newX, newY) && attempts < 10);
+
+        if(grid.isEmpty(newX, newY)){
+            x = newX;
+            y = newY;
+        }
     }
 
     public int getX(){ return x; }
