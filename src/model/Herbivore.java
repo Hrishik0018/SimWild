@@ -10,9 +10,7 @@ public class Herbivore extends Entity {
 
     @Override
     public void act(Grid grid){
-
         move(grid);
-
         outer:
         for(int dx=-1; dx<=1; dx++){
             for(int dy=-1; dy<=1; dy++){
@@ -32,23 +30,18 @@ public class Herbivore extends Entity {
                 }
             }
         }
-
         if(energy >= grid.herbReproduceThreshold){
             reproduce(grid);
         }
-
         energy--;
-
         if(energy <= 0){
             grid.removeEntity(this);
         }
     }
 
     private void reproduce(Grid grid){
-
         int nx = x + (int)(Math.random()*3)-1;
         int ny = y + (int)(Math.random()*3)-1;
-
         if(nx>=0 && ny>=0 && nx<grid.getRows() && ny<grid.getCols()){
             if(grid.isEmpty(nx,ny)){
                 grid.addEntity(new Herbivore(nx,ny,energy/2));

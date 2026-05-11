@@ -35,19 +35,37 @@ public class GraphFX {
 
     public void show() {
 
-        popChart = new LineChart<>(new NumberAxis(), new NumberAxis());
+        NumberAxis x1 = new NumberAxis();
+        NumberAxis y1 = new NumberAxis();
+
+        x1.setLabel("Time Steps");
+        y1.setLabel("Population Count");
+
+        popChart = new LineChart<>(x1, y1);
         popChart.setTitle("Population Trends");
         popChart.setCreateSymbols(true);
         popChart.getData().addAll(plant, herb, carn);
 
+        NumberAxis x2 = new NumberAxis();
+        NumberAxis y2 = new NumberAxis();
+
+        x2.setLabel("Time Steps");
+        y2.setLabel("Average Energy");
+
         LineChart<Number, Number> energyChart =
-                new LineChart<>(new NumberAxis(), new NumberAxis());
+                new LineChart<>(x2, y2);
         energyChart.setTitle("Average Energy");
         energyChart.setCreateSymbols(true);
         energyChart.getData().add(energySeries);
 
+        NumberAxis x3 = new NumberAxis();
+        NumberAxis y3 = new NumberAxis();
+
+        x3.setLabel("Time Steps");
+        y3.setLabel("Herbivore / Carnivore Ratio");
+
         LineChart<Number, Number> ppChart =
-                new LineChart<>(new NumberAxis(), new NumberAxis());
+                new LineChart<>(x3, y3);
         ppChart.setTitle("Predator–Prey Balance");
         ppChart.setCreateSymbols(true);
         ppChart.getData().add(predatorPrey);
@@ -59,7 +77,6 @@ public class GraphFX {
         stage.setTitle("Ecosystem Graph");
         stage.show();
 
-        // ✅ COLORS + LEGEND FIX
         Platform.runLater(() -> {
             plant.getNode().setStyle("-fx-stroke: green;");
             herb.getNode().setStyle("-fx-stroke: orange;");
@@ -86,30 +103,31 @@ public class GraphFX {
 
     public void update(int p, int h, int c, double avgEnergy, int step) {
 
-        // 👉 extinction fix
-        if (p == 0) plantBuffer.clear();
-        if (h == 0) herbBuffer.clear();
-        if (c == 0) carnBuffer.clear();
+        if (p == 0) plantBuffer.add(0);
+        if (h == 0) herbBuffer.add(0);
+        if (c == 0) carnBuffer.add(0);
 
         double sp = (p == 0) ? 0 : Math.round(smooth(plantBuffer, p));
         double sh = (h == 0) ? 0 : Math.round(smooth(herbBuffer, h));
         double sc = (c == 0) ? 0 : Math.round(smooth(carnBuffer, c));
 
-        plant.getData().add(new XYChart.Data<>(step, sp));
-        herb.getData().add(new XYChart.Data<>(step, sh));
-        carn.getData().add(new XYChart.Data<>(step, sc));
+        Platform.runLater(() -> {
 
-        energySeries.getData().add(new XYChart.Data<>(step, avgEnergy));
-        predatorPrey.getData().add(new XYChart.Data<>(step, (double) h / (c + 1)));
+            plant.getData().add(new XYChart.Data<>(step, sp));
+            herb.getData().add(new XYChart.Data<>(step, sh));
+            carn.getData().add(new XYChart.Data<>(step, sc));
 
-        // memory limit
-        if (plant.getData().size() > 150) {
-            plant.getData().remove(0);
-            herb.getData().remove(0);
-            carn.getData().remove(0);
-            energySeries.getData().remove(0);
-            predatorPrey.getData().remove(0);
-        }
+            energySeries.getData().add(new XYChart.Data<>(step, avgEnergy));
+            predatorPrey.getData().add(new XYChart.Data<>(step, (double) h / (c + 1)));
+
+            if (plant.getData().size() > 150) {
+                plant.getData().remove(0);
+                herb.getData().remove(0);
+                carn.getData().remove(0);
+                energySeries.getData().remove(0);
+                predatorPrey.getData().remove(0);
+            }
+        });
     }
 
     public void reset() {
